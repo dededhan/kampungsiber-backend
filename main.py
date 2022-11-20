@@ -268,5 +268,65 @@ def consultationSession():
     finally:
         return response
 
+@app.route('/consultationSession/payment/<int:consult_id>', methods=['PUT'])
+def consultationSessionPayment(consult_id):
+    try:
+        _json = request.json
+        _payment_status = _json['payment_status']
+        if 'email' in session:
+            sql = "UPDATE `consultation_request` SET `payment_status`=%s WHERE `id`=%s"
+            data = (_payment_status, consult_id)
+            connection = mysql.connect()
+            cursor = connection.cursor()
+            cursor.execute(sql, data)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            response = jsonify('Consultation session payment status changed')
+            response.status_code = 200
+        else:
+            response = jsonify('Unauthorized')
+            response.status_code = 401
+    except Exception as e:
+        print(e)
+        response = jsonify('Failed to change consultation session payment status')
+        response.status_code = 400
+    finally:
+        return response
+
+@app.route('/consultationSession/accept/', methods=['POST'])
+def consultationSessionAccept():
+    try:
+        _json = request.json
+        _id = _json['id']
+        _consultation_req_id = _json['consultation_req_id']
+        _link_zoom = _json['link_zoom']
+        if 'email' in session:
+            sql = "insert into acc_consultation_req (consultation_req_id, link_zoom) values (%s, %s)"
+            data = (_consultation_req_id, _link_zoom)
+            connection = mysql.connect()
+            cursor = connection.cursor()
+            cursor.execute(sql, data)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            response = jsonify('Consultation session accepted')
+            response.status_code = 200
+        else:
+            response = jsonify('Unauthorized')
+            response.status_code = 401
+    except Exception as e:
+        print(e)
+        response = jsonify('Failed to accept consultation session')
+        response.status_code = 400
+    finally:
+        return response
+
+@app.errorhandler(404)
+def otherRoutes(error=None):
+    response = jsonify({'status': 404, 'message': 'Not Found:'+request.url, })
+    response.status_code = 404
+    return response
+
 if __name__ == "__main__":
     app.run(debug=True)
