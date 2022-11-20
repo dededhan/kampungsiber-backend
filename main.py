@@ -153,7 +153,7 @@ def confirmResetPassword():
         _email = _json['email']
         _password = _json['password']
         _confirmPassword = _json['confirmPassword']
-        if _email and _password and request.method == 'POST':
+        if _email and _password and request.method == 'PUT':
             sql = "SELECT * FROM `user` WHERE `email`=%s"
             data = (_email)
             connection = mysql.connect()
