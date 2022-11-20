@@ -298,7 +298,6 @@ def consultationSessionPayment(consult_id):
 def consultationSessionAccept():
     try:
         _json = request.json
-        _id = _json['id']
         _consultation_req_id = _json['consultation_req_id']
         _link_zoom = _json['link_zoom']
         if 'email' in session:
