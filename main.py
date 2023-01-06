@@ -188,8 +188,8 @@ def confirmResetPassword():
 @app.route('/consultationSession/upcoming/<int:user_id>', methods=['GET'])
 def consultationSessionUpcoming(user_id):
     try:
-        if 'email' in session:
-            sql = "select id, requestor_id, mentor_id, consultation_date, date_format(start_time, '%%T') as start_time, date_format(end_time, '%%T') as end_time, is_accepted_mentor, payment_status from consultation_request cr where cast(concat(consultation_date , ' ', start_time) as datetime) > now() and requestor_id = %s and is_accepted_mentor = 1 and payment_status = 1"
+            # sql = "select id, requestor_id, mentor_id, consultation_date, date_format(start_time, '%%T') as start_time, date_format(end_time, '%%T') as end_time, is_accepted_mentor, payment_status from consultation_request cr where cast(concat(consultation_date , ' ', start_time) as datetime) > now() and requestor_id = %s and is_accepted_mentor = 1 and payment_status = 1"
+            sql = "select cr.id, requestor_id, mentor_id, mm.jobtitle, consultation_date, date_format(start_time, '%%T') as start_time, date_format(end_time, '%%T') as end_time, is_accepted_mentor, payment_status, mm.name as 'mentor_name', mm.mentor_gambar as 'gambar' from consultation_request cr join mentor_main mm on cr.mentor_id = mm.id where cast(concat(consultation_date , ' ', start_time) as datetime) > now() and requestor_id = %s and is_accepted_mentor = 1 and payment_status = 1;"
             data = (user_id)
             connection = mysql.connect()
             cursor = connection.cursor(pymysql.cursors.DictCursor)
@@ -202,9 +202,10 @@ def consultationSessionUpcoming(user_id):
             else:
                 response = jsonify('No upcoming consultation session')
                 response.status_code = 400
-        else:
-            response = jsonify('Unauthorized')
-            response.status_code = 401
+        # if 'email' in session:
+        # else:
+        #     response = jsonify('Unauthorized')
+        #     response.status_code = 401
     except Exception as e:
         print(e)
         response = jsonify('Failed to get upcoming consultation session')
